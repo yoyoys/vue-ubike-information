@@ -1,7 +1,28 @@
+
+var bikeApi;
 var vm = new Vue({
     el: '#app',
     data: {
-        ubikeStops: []
+        stations:{},
+        openStatus:{}
+    },
+    computed:{
+        
+    },
+    methods:{
+        totSum(stations){
+            return _.sumBy(stations,(o)=>{return +o.tot;})
+        },
+        sbiSum(stations){
+            return _.sumBy(stations,(o)=>{return +o.sbi;})
+        },
+        bempSum(stations){
+            return _.sumBy(stations,(o)=>{return +o.bemp;});
+        },
+        switchStatus(index){
+            console.log(this.openStatus[index]);
+            this.openStatus[index]^=true;
+        }
     },
     filters: {
       timeFormat(t){
@@ -32,8 +53,9 @@ var vm = new Vue({
             .then(res => {
 
                 // 將 json 轉陣列後存入 this.ubikeStops
-                this.ubikeStops = Object.keys(res.data.retVal).map(key => res.data.retVal[key]);
-
+                var rawDatas = Object.keys(res.data.retVal).map(key => res.data.retVal[key]);
+                stations =this.stations=_.groupBy(rawDatas,function(n){return n.sarea;});;
+                openStatus=this.openStatus=_.mapValues(stations,()=>{return false;});
             });
 
     }

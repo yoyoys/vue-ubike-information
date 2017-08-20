@@ -1,24 +1,55 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>YouBike 臺北市公共自行車即時資訊</title>
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+    crossorigin="anonymous">
 
   <style>
-    body{ padding: 1em;  }
+    body {
+      padding: 1em;
+    }
   </style>
 
 </head>
+
 <body>
 
   <h1>YouBike 臺北市公共自行車即時資訊</h1>
 
   <div id="app">
-
-    <table class="table table-striped">
+    <div id="accordion">
+      <template v-for="filtedStations, index in stations">
+        <h3 @click="switchStatus(index)"> 
+          {{index}}, 站點數：{{filtedStations.length}} , 尚有：{{bempSum(filtedStations)}}， 總停車格：{{totSum(filtedStations)}}，
+        </h3>
+        <div>
+              <table v-show="openStatus[index]">
+                <thead>
+                    <th>#</th>
+                    <th>場站名稱</th>
+                    <th>目前可用車輛</th>
+                    <th>總停車格</th>
+                    <th>資料更新時間</th>
+                </thead>
+                <tbody>
+                    <tr v-for="item, index in filtedStations">
+                        <td>{{ index }}</td>
+                        <td>{{ item.sna }}</td>
+                        <td>{{ item.sbi }}</td>
+                        <td>{{ item.tot }}</td>
+                        <td>{{ item.mday | timeFormat }}</td>
+                    </tr>
+                </tbody>
+              </table>
+        </div>
+      </template>
+    </div>
+    <!--table class="table table-striped">
       <thead>
         <tr>
           <th>#</th>
@@ -30,8 +61,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="s in ubikeStops">
-          <td>{{ s.sno }}</td>
+        <tr v-for="s,index in ubikeStops">
+          <td>{{ index }}</td>
           <td>{{ s.sna }}</td>
           <td>{{ s.sarea }}</td>
           <td>{{ s.sbi }}</td>
@@ -40,13 +71,16 @@
         </tr>
       </tbody>
 
-    </table>
+    </table-->
 
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
+
   <script src="scripts.js"></script>
 
 </body>
+
 </html>
