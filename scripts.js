@@ -1,15 +1,30 @@
-
+function test(a,b){
+    return a.sbi===b.sbi;
+}
 var bikeApi;
 var vm = new Vue({
     el: '#app',
     data: {
-        stations:{},
-        openStatus:{}
+        rawDatas:null,
+        openedGroup:null,
+        diffStations:{}
     },
     computed:{
-        
+        stationDic(){
+            return this.makeDict(this.rawDatas);
+        },
+        groupedStation(){
+            return _.groupBy(this.rawDatas,function(n){return n.sarea;});
+        }
     },
     methods:{
+        makeDict(raw){
+            return raw.reduce(function(map,obj){
+                var key = 's'+obj.sno;
+                map[key] = obj;
+                return map;
+            },{});
+        },
         totSum(stations){
             return _.sumBy(stations,(o)=>{return +o.tot;})
         },
@@ -20,8 +35,38 @@ var vm = new Vue({
             return _.sumBy(stations,(o)=>{return +o.bemp;});
         },
         switchStatus(index){
-            console.log(this.openStatus[index]);
-            this.openStatus[index]^=true;
+            this.openedGroup[index]^=true;
+        },
+        refreshData(){
+            
+        // 欄位說明請參照:
+        // http://data.taipei/opendata/datalist/datasetMeta?oid=8ef1626a-892a-4218-8344-f7ac46e1aa48
+
+        // sno：站點代號、 sna：場站名稱(中文)、 tot：場站總停車格、
+        // sbi：場站目前車輛數量、 sarea：場站區域(中文)、 mday：資料更新時間、
+        // lat：緯度、 lng：經度、 ar：地(中文)、 sareaen：場站區域(英文)、
+        // snaen：場站名稱(英文)、 aren：地址(英文)、 bemp：空位數量、 act：全站禁用狀態
+
+            return axios.get('https://tcgbusfs.blob.core.windows.net/blobyoubike/YouBikeTP.gz')
+            .then(res => {
+                
+                var oldData;
+                var oldDict;
+                if(this.rawDatas){
+                    oldData=_.clone(this.rawDatas);
+                    oldDict=this.makeDict(oldData);
+                }
+                    
+
+                this.rawDatas =Object.keys(res.data.retVal).map(key => res.data.retVal[key]);
+                this.diffStations=_.differenceWith(this.rawDatas, oldData, test);                
+                stst=this.stationDic;   //for test
+                ds=this.diffStations;
+                if(oldData&& this.diffStations.length>0) 
+                    _.forEach(this.diffStations,function(v){
+                        console.log(v.sna,v.sbi,oldDict['s'+v.sno].sbi,oldDict['s'+v.sno]);
+                    });
+            });
         }
     },
     filters: {
@@ -40,23 +85,14 @@ var vm = new Vue({
       }
     },
     created() {
-
-        // 欄位說明請參照:
-        // http://data.taipei/opendata/datalist/datasetMeta?oid=8ef1626a-892a-4218-8344-f7ac46e1aa48
-
-        // sno：站點代號、 sna：場站名稱(中文)、 tot：場站總停車格、
-        // sbi：場站目前車輛數量、 sarea：場站區域(中文)、 mday：資料更新時間、
-        // lat：緯度、 lng：經度、 ar：地(中文)、 sareaen：場站區域(英文)、
-        // snaen：場站名稱(英文)、 aren：地址(英文)、 bemp：空位數量、 act：全站禁用狀態
-
-        axios.get('https://tcgbusfs.blob.core.windows.net/blobyoubike/YouBikeTP.gz')
-            .then(res => {
-
-                // 將 json 轉陣列後存入 this.ubikeStops
-                var rawDatas = Object.keys(res.data.retVal).map(key => res.data.retVal[key]);
-                stations =this.stations=_.groupBy(rawDatas,function(n){return n.sarea;});;
-                openStatus=this.openStatus=_.mapValues(stations,()=>{return false;});
+        this.refreshData()
+            .then(()=>{
+                this.openedGroup=_.mapValues(this.groupedStation,()=>{return false;});            
             });
+
+        setInterval((e)=>{
+             this.refreshData();
+        },5000);
 
     }
 });

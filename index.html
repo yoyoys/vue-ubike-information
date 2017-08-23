@@ -5,82 +5,89 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>YouBike 臺北市公共自行車即時資訊</title>
-
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
-    crossorigin="anonymous">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" integrity="sha256-HxaKz5E/eBbvhGMNwhWRPrAR9i/lG1JeT4mD6hCQ7s4=" crossorigin="anonymous" />
   <style>
     body {
       padding: 1em;
     }
+    #map{
+      width:300px;
+      height:300px;
+    }
   </style>
-
 </head>
-
-<body>
-
+<body>  
   <h1>YouBike 臺北市公共自行車即時資訊</h1>
-
   <div id="app">
+    <div id="map">
+
+    </div>
     <div id="accordion">
-      <template v-for="filtedStations, index in stations">
+      <template v-for="filtedStations, index in groupedStation">
         <h3 @click="switchStatus(index)"> 
           {{index}}, 站點數：{{filtedStations.length}} , 尚有：{{bempSum(filtedStations)}}， 總停車格：{{totSum(filtedStations)}}，
         </h3>
-        <div>
-              <table v-show="openStatus[index]">
-                <thead>
-                    <th>#</th>
-                    <th>場站名稱</th>
-                    <th>目前可用車輛</th>
-                    <th>總停車格</th>
-                    <th>資料更新時間</th>
-                </thead>
-                <tbody>
-                    <tr v-for="item, index in filtedStations">
-                        <td>{{ index }}</td>
-                        <td>{{ item.sna }}</td>
-                        <td>{{ item.sbi }}</td>
-                        <td>{{ item.tot }}</td>
-                        <td>{{ item.mday | timeFormat }}</td>
-                    </tr>
-                </tbody>
-              </table>
+        <div v-show="openedGroup ? openedGroup[index]:false">
+          <table>
+            <thead>
+                <th>#</th>
+                <th>場站名稱</th>
+                <th>目前可用車輛</th>
+                <th>總停車格</th>
+                <th>資料更新時間</th>
+            </thead>
+            <tbody>
+                <tr v-for="item, index in filtedStations">
+                    <td>{{ item.sno }}</td>
+                    <td>{{ item.sna }}</td>
+                    <td>{{ item.sbi }}</td>
+                    <td>{{ item.tot }}</td>
+                    <td>{{ item.mday | timeFormat }}</td>
+                </tr>
+            </tbody>
+          </table>
         </div>
       </template>
-    </div>
-    <!--table class="table table-striped">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>場站名稱</th>
-          <th>場站區域</th>
-          <th>目前可用車輛</th>
-          <th>總停車格</th>
-          <th>資料更新時間</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="s,index in ubikeStops">
-          <td>{{ index }}</td>
-          <td>{{ s.sna }}</td>
-          <td>{{ s.sarea }}</td>
-          <td>{{ s.sbi }}</td>
-          <td>{{ s.tot }}</td>
-          <td>{{ s.mday | timeFormat }}</td>
-        </tr>
-      </tbody>
-
-    </table-->
-
+    </div>  
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
+  <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 2,
+          center: new google.maps.LatLng(2.8,-187.3),
+          mapTypeId: 'terrain'
+        });
 
+        // Create a <script> tag and set the USGS URL as the source.
+        var script = document.createElement('script');
+        // This example uses a local copy of the GeoJSON stored at
+        // http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojsonp
+        script.src = 'https://developers.google.com/maps/documentation/javascript/examples/json/earthquake_GeoJSONP.js';
+        document.getElementsByTagName('head')[0].appendChild(script);
+      }
+
+      // Loop through the results array and place a marker for each
+      // set of coordinates.
+      window.eqfeed_callback = function(results) {
+        for (var i = 0; i < results.features.length; i++) {
+          var coords = results.features[i].geometry.coordinates;
+          var latLng = new google.maps.LatLng(coords[1],coords[0]);
+          var marker = new google.maps.Marker({
+            position: latLng,
+            map: map
+          });
+        }
+      }
+    </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC-9zyzIXHnwVPIAEsOU0BD9GJIRBXNTig&callback=initMap">
+  </script>
   <script src="scripts.js"></script>
-
+  
 </body>
 
 </html>
