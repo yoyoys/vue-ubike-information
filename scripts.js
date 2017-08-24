@@ -1,36 +1,42 @@
 var vm = new Vue({
     el: '#app',
     data: {
-        isDrawerOpen:false,
+        isDrawerOpen: false,
         rawDatas: null,
-        openedGroup:{},
+        openedGroup: {},
         group: "sarea",
-        groupLength:3,
-        availableColumns:[]        
+        groupLength: 3,
+        availableColumns: []
     },
     computed: {
         stationDic() {
             return this.makeDict(this.rawDatas);
         },
-        groupedStation(){
-            return _.groupBy(this.rawDatas, (n) => {return n[this.group].substring(0,this.groupLength);});
+        groupedStation() {
+            return _.groupBy(this.rawDatas, (n) => {
+                return n[this.group].substring(0, this.groupLength);
+            });
         }
     },
     watch: {
-        groupLength(){
-            this.openedGroup = _.mapValues(this.groupedStation, () => {return false;});            
+        groupLength() {
+            this.openedGroup = _.mapValues(this.groupedStation, () => {
+                return false;
+            });
         },
-        group(){
-            this.groupLength=_.max(this.rawDatas.map((o)=>{     //get maxLength from new column
+        group() {
+            this.groupLength = _.max(this.rawDatas.map((o) => { //get maxLength from new column
                 return o[this.group].length;
-            }));  
+            }));
 
-            this.openedGroup = _.mapValues(this.groupedStation, () => {return false;});
+            this.openedGroup = _.mapValues(this.groupedStation, () => {
+                return false;
+            });
         }
     },
     methods: {
-        switchDrawer(){
-            this.isDrawerOpen=!this.isDrawerOpen;
+        switchDrawer() {
+            this.isDrawerOpen = !this.isDrawerOpen;
         },
         makeDict(raw) {
             return raw.reduce(function (map, obj) {
@@ -80,7 +86,9 @@ var vm = new Vue({
                     this.rawDatas = Object.keys(res.data.retVal).map(key => res.data.retVal[key]);
 
 
-                    var diffStations = _.differenceWith(this.rawDatas, oldData, (a, b)=> {return a.sbi === b.sbi;});
+                    var diffStations = _.differenceWith(this.rawDatas, oldData, (a, b) => {
+                        return a.sbi === b.sbi;
+                    });
 
                     stst = this.stationDic; //for test
 
@@ -112,8 +120,29 @@ var vm = new Vue({
     created() {
         this.refreshData()
             .then(() => {
-                this.openedGroup = _.mapValues(this.groupedStation, () => {return false;});
+                this.openedGroup = _.mapValues(this.groupedStation, () => {
+                    return false;
+                });
             });
+
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-bottom-left",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+
 
         setInterval((e) => {
             this.refreshData();
