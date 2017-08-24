@@ -1,6 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
+        isDrawerOpen:false,
         rawDatas: null,
         openedGroup:{},
         group: "sarea",
@@ -28,7 +29,9 @@ var vm = new Vue({
         }
     },
     methods: {
-
+        switchDrawer(){
+            this.isDrawerOpen=!this.isDrawerOpen;
+        },
         makeDict(raw) {
             return raw.reduce(function (map, obj) {
                 map['s' + obj.sno] = obj;
