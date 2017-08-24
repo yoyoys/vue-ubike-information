@@ -1,24 +1,29 @@
-function test(a, b) {
-    return a.sbi === b.sbi;
-}
-var bikeApi;
 var vm = new Vue({
     el: '#app',
     data: {
         rawDatas: null,
         openedGroup:{},
-        group: "sarea"
+        group: "sarea",
+        groupLength:3,
+        availableColumns:[]        
     },
     computed: {
         stationDic() {
             return this.makeDict(this.rawDatas);
         },
         groupedStation(){
-            return _.groupBy(this.rawDatas, (n) => {return n[this.group];});
+            return _.groupBy(this.rawDatas, (n) => {return n[this.group].substring(0,this.groupLength);});
         }
     },
     watch: {
+        groupLength(){
+            this.openedGroup = _.mapValues(this.groupedStation, () => {return false;});            
+        },
         group(){
+            this.groupLength=_.max(this.rawDatas.map((o)=>{     //get maxLength from new column
+                return o[this.group].length;
+            }));  
+
             this.openedGroup = _.mapValues(this.groupedStation, () => {return false;});
         }
     },
@@ -26,8 +31,7 @@ var vm = new Vue({
 
         makeDict(raw) {
             return raw.reduce(function (map, obj) {
-                var key = 's' + obj.sno;
-                map[key] = obj;
+                map['s' + obj.sno] = obj;
                 return map;
             }, {});
         },
@@ -73,7 +77,7 @@ var vm = new Vue({
                     this.rawDatas = Object.keys(res.data.retVal).map(key => res.data.retVal[key]);
 
 
-                    var diffStations = _.differenceWith(this.rawDatas, oldData, test);
+                    var diffStations = _.differenceWith(this.rawDatas, oldData, (a, b)=> {return a.sbi === b.sbi;});
 
                     stst = this.stationDic; //for test
 
