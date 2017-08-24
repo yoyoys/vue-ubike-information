@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width">
   <title>YouBike 臺北市公共自行車即時資訊</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" integrity="sha256-HxaKz5E/eBbvhGMNwhWRPrAR9i/lG1JeT4mD6hCQ7s4=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
   <style>
     body {
       padding: 1em;
@@ -27,7 +28,7 @@
         <h3 @click="switchStatus(index)"> 
           {{index}}, 站點數：{{filtedStations.length}} , 尚有：{{bempSum(filtedStations)}}， 總停車格：{{totSum(filtedStations)}}，
         </h3>
-        <div v-show="openedGroup ? openedGroup[index]:false">
+        <div v-show="openedGroup[index]">
           <table>
             <thead>
                 <th>#</th>
@@ -54,6 +55,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
+  <script  src="https://code.jquery.com/jquery-3.2.1.min.js"  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  
   <script>
       var map;
       function initMap() {
