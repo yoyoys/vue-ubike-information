@@ -50,6 +50,9 @@
 #drawer *{
     opacity: 0;
 }
+#drawer #switchBtn{
+    opacity: 1;
+}
 
 .open-drawer #map {
     margin-right: 35%;

@@ -18,10 +18,12 @@
 
       </div>
       <div id="drawer">
+          <button id="switchBtn" @click.prevent="switchDrawer()">Toogle</button>
+          
         <div id="accordion">
           <div>
             類別：<input v-model="group"/><br/>
-            長度：<input v-model="groupLength" type="number" min="0" step="1"/><br/>
+            長度：<input v-model="groupLength" type="number" min="0" step="1"/><br/>            
           </div>
           <div v-for="filtedStations, index in groupedStation">
             <h3 @click="switchStatus(index)">
