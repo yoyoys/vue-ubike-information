@@ -19,7 +19,11 @@
       </div>
       <div id="drawer">
         <div id="accordion">
-          <template v-for="filtedStations, index in groupedStation">
+          <div>
+            類別：<input v-model="group"/><br/>
+            長度：<input v-model="groupLength" type="number" min="0" step="1"/><br/>
+          </div>
+          <div v-for="filtedStations, index in groupedStation">
             <h3 @click="switchStatus(index)">
               {{index}}, 站點數：{{filtedStations.length}} , 尚有：{{bempSum(filtedStations)}}， 總停車格：{{totSum(filtedStations)}}，
             </h3>
@@ -28,7 +32,7 @@
                 <thead>
                   <th>#</th>
                   <th>場站名稱</th>
-                  <th>目前可用車輛</th>
+                  <th>可用</th>
                   <th>總停車格</th>
                   <th>資料更新時間</th>
                 </thead>
@@ -43,7 +47,7 @@
                 </tbody>
               </table>
             </div>
-          </template>
+          </div>
         </div>
       </div>
     </div>
