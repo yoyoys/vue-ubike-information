@@ -1,7 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
-        isDrawerOpen: true,
+        isDrawerOpen: false,
         rawDatas: null,
         openedGroup: {},
         group: "sarea",
@@ -230,6 +230,7 @@ var vm = new Vue({
         this.refreshData()
             .then(() => {
                 this.setMarkers();
+                this.isDrawerOpen=true;
                 this.openedGroup = _.mapValues(this.groupedStation, () => {
                     return false;
                 });
