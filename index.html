@@ -22,7 +22,12 @@
           
         <div id="accordion">
           <div>
-            類別：<input v-model="group"/><br/>
+            類別：
+            <select v-model="group">
+              <option v-for="item in availableColumns" :value="item.value">
+                {{item.name}}
+              </option>
+            </select><br/>
             長度：<input v-model="groupLength" type="number" min="0" step="1"/><br/>            
           </div>
           <div v-for="filtedStations, index in groupedStation">
@@ -39,7 +44,7 @@
                   <th>資料更新時間</th>
                 </thead>
                 <tbody>
-                  <tr v-for="item, index in filtedStations">
+                  <tr v-for="item, index in filtedStations" @click="navToStation(item)">
                     <td>{{ item.sno }}</td>
                     <td>{{ item.sna }}</td>
                     <td>{{ item.sbi }}</td>

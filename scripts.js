@@ -6,13 +6,86 @@ var vm = new Vue({
         openedGroup: {},
         group: "sarea",
         groupLength: 3,
-        availableColumns: [],
-        googleMap:{
-            map:null,
+        availableColumns: [{
+                value: 'sno',
+                name: '站點代號'
+            },
+            {
+                value: 'sna',
+                name: '場站名稱(中文)'
+            },
+            {
+                value: 'tot',
+                name: '場站總停車格'
+            },
+            {
+                value: 'sbi',
+                name: '場站目前車輛數量'
+            },
+            {
+                value: 'sarea',
+                name: '場站區域(中文)'
+            },
+            {
+                value: 'mday',
+                name: '資料更新時間'
+            },
+            {
+                value: 'lat',
+                name: '緯度'
+            },
+            {
+                value: 'lng',
+                name: '經度'
+            },
+            {
+                value: 'ar',
+                name: '地(中文)'
+            },
+            {
+                value: 'sareaen',
+                name: '場站區域(英文)'
+            },
+            {
+                value: 'snaen',
+                name: '場站名稱(英文)'
+            },
+            {
+                value: 'aren',
+                name: '地址(英文)'
+            },
+            {
+                value: 'bemp',
+                name: '空位數量'
+            },
+            {
+                value: 'act',
+                name: '全站禁用狀態'
+            }
+        ],
+        googleMap: {
+            map: null,
             center: new google.maps.LatLng(25.037, 121.563),
-            zoom:15,
-            markers:[]
-        }
+            zoom: 15,
+            markers: []
+        },
+        markers:[],
+        markerIcon: {
+            path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+            fillColor: 'DarkOrange',
+            fillOpacity: 1,
+            strokeColor: 'MidnightBlue',
+            strokeWeight: 3,
+            scale: 3
+        },
+        markerIconHover: {
+            path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+            fillColor: 'PowderBlue',
+            fillOpacity: 1,
+            strokeColor: 'MidnightBlue',
+            strokeWeight: 3,
+            scale: 4
+        },
     },
     computed: {
         stationDic() {
@@ -69,15 +142,6 @@ var vm = new Vue({
             this.openedGroup[index] = !this.openedGroup[index];
         },
         refreshData() {
-
-            // 欄位說明請參照:
-            // http://data.taipei/opendata/datalist/datasetMeta?oid=8ef1626a-892a-4218-8344-f7ac46e1aa48
-
-            // sno：站點代號、 sna：場站名稱(中文)、 tot：場站總停車格、
-            // sbi：場站目前車輛數量、 sarea：場站區域(中文)、 mday：資料更新時間、
-            // lat：緯度、 lng：經度、 ar：地(中文)、 sareaen：場站區域(英文)、
-            // snaen：場站名稱(英文)、 aren：地址(英文)、 bemp：空位數量、 act：全站禁用狀態
-
             return axios.get('https://tcgbusfs.blob.core.windows.net/blobyoubike/YouBikeTP.gz')
                 .then(res => {
 
@@ -100,20 +164,43 @@ var vm = new Vue({
 
 
                     if (oldData && diffStations.length > 0)
-                        _.forEach(diffStations, function (v) {
+                    {
+                        _.forEach(diffStations, (v) =>{
                             console.log(v.sna, v.sbi, oldDict['s' + v.sno].sbi, oldDict['s' + v.sno]);
+                            this.refreshMarker(v);
                             toastr.success(v.sna + '車輛更新', v.sna);
                         });
+                    }
                 });
         },
-        initMap(){
-            console.log('map')
+        initMap() {
             this.googleMap.map = new google.maps.Map(document.getElementById('map'), {
                 zoom: this.googleMap.zoom,
                 center: this.googleMap.center,
-              });
-
-            
+            });
+        },
+        setMarkers() {
+            _.forOwn(this.rawDatas, this.setMarker);
+        },
+        setMarker(rawData) {
+            var marker = new google.maps.Marker({
+                position: {
+                    lat: Number(rawData.lat),
+                    lng: Number(rawData.lng)
+                },
+                animation: google.maps.Animation.DROP,
+                icon: this.markerIcon,
+                map: this.googleMap.map
+            });
+            this.markers['s'+rawData.sno]=marker;
+        },        
+        refreshMarker(station) {
+            this.markers['s'+station.sno].setMap(null);
+            this.setMarker(station);
+        },
+        navToStation(station){
+            console.log(station);
+            this.googleMap.map.setCenter({lat:Number(station.lat),lng:Number(station.lng)});
         }
     },
     filters: {
@@ -135,6 +222,7 @@ var vm = new Vue({
     created() {
         this.refreshData()
             .then(() => {
+                this.setMarkers();
                 this.openedGroup = _.mapValues(this.groupedStation, () => {
                     return false;
                 });
@@ -161,10 +249,11 @@ var vm = new Vue({
 
         setInterval((e) => {
             this.refreshData();
-        }, 30000);
+            //this.refreshMarkers();
+        }, 5000);
 
     },
-    mounted(){
+    mounted() {
         this.initMap();
     }
 });
