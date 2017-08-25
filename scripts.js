@@ -5,6 +5,7 @@ var vm = new Vue({
         rawDatas: null,
         openedGroup: {},
         group: "sarea",
+        selectedMarker:null,
         groupLength: 3,
         availableColumns: [{
                 value: 'sno',
@@ -84,7 +85,7 @@ var vm = new Vue({
             fillOpacity: 1,
             strokeColor: 'MidnightBlue',
             strokeWeight: 3,
-            scale: 4
+            scale: 6
         },
     },
     computed: {
@@ -192,6 +193,8 @@ var vm = new Vue({
                 icon: this.markerIcon,
                 map: this.googleMap.map
             });
+            
+
             this.markers['s'+rawData.sno]=marker;
         },        
         refreshMarker(station) {
@@ -199,7 +202,11 @@ var vm = new Vue({
             this.setMarker(station);
         },
         navToStation(station){
-            console.log(station);
+            if(this.selectedMarker!=null)
+                this.selectedMarker.setIcon(this.markerIcon);
+            this.selectedMarker = this.markers['s'+station.sno];
+            this.selectedMarker.setIcon(this.markerIconHover);
+
             this.googleMap.map.setCenter({lat:Number(station.lat),lng:Number(station.lng)});
         }
     },
