@@ -1,7 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
-        isDrawerOpen: false,
+        isDrawerOpen: true,
         rawDatas: null,
         openedGroup: {},
         group: "sarea",
@@ -163,7 +163,7 @@ var vm = new Vue({
 
                     stst = this.stationDic; //for test
 
-
+                    console.log(diffStations);
                     if (oldData && diffStations.length > 0)
                     {
                         _.forEach(diffStations, (v) =>{
