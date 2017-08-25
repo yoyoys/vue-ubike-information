@@ -6,7 +6,13 @@ var vm = new Vue({
         openedGroup: {},
         group: "sarea",
         groupLength: 3,
-        availableColumns: []
+        availableColumns: [],
+        googleMap:{
+            map:null,
+            center: new google.maps.LatLng(25.037, 121.563),
+            zoom:15,
+            markers:[]
+        }
     },
     computed: {
         stationDic() {
@@ -99,6 +105,15 @@ var vm = new Vue({
                             toastr.success(v.sna + '車輛更新', v.sna);
                         });
                 });
+        },
+        initMap(){
+            console.log('map')
+            this.googleMap.map = new google.maps.Map(document.getElementById('map'), {
+                zoom: this.googleMap.zoom,
+                center: this.googleMap.center,
+              });
+
+            
         }
     },
     filters: {
@@ -146,7 +161,10 @@ var vm = new Vue({
 
         setInterval((e) => {
             this.refreshData();
-        }, 5000);
+        }, 30000);
 
+    },
+    mounted(){
+        this.initMap();
     }
 });
