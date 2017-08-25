@@ -169,7 +169,7 @@ var vm = new Vue({
                         _.forEach(diffStations, (v) =>{
                             console.log(v.sna, v.sbi, oldDict['s' + v.sno].sbi, oldDict['s' + v.sno]);
                             this.refreshMarker(v);
-                            toastr.success(v.sna + '車輛更新', v.sna);
+                            toastr.success(v.sna + '車輛更新，現有車輛'+v.sbi, v.sna);
                         });
                     }
                 });
